@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview" ,
-    "deploy": "vite build && gh-pages -d dist"
+    "deploy": "vite build && gh-pages -d E:\\core\\frontend\\dist"
   },
   "dependencies": {
     "@a1rth/css-normalize": "^1.2.4",
