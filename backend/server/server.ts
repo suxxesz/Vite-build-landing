@@ -38,7 +38,10 @@ async function start() {
   try {
 
   await app.register(cors, {
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173',
+      'https://suxxesz.github.io',
+    ]
+
   })
     await app.register(addBootstrap)
     const bot = new Telegraf(app.config.TELEGRAM_BOT_TOKEN);   

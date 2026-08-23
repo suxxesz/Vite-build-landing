@@ -5,10 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.ts",
-    "start:bot": "node server/bot/start.ts",
-    "dev": "nodemon server/server.js",
-    "dev:bot": "nodemon server/bot/start.js"
+    "start": "node --import tsx/esm server/server.ts",
+    "dev": "nodemon --exec tsx server/server.ts"
   },
   "keywords": [],
   "author": "",
