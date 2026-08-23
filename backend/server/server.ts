@@ -39,7 +39,7 @@ async function start() {
 
   await app.register(cors, {
     origin: ['http://localhost:5173',
-      'https://suxxesz.github.io',
+      'https://suxxesz.github.io/core/',
     ]
 
   })

@@ -1,14 +1,11 @@
-import Database from 'better-sqlite3'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
+import { createClient } from '@libsql/client'
  
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DB_PATH = process.env.DB_PATH ?? path.join(__dirname, 'data.db')
+const db = createClient({
+  url:       process.env.TURSO_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN!,
+})
  
-const db = new Database(DB_PATH)
- 
-db.exec(`
+await db.execute(`
   CREATE TABLE IF NOT EXISTS applications (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     discord_id TEXT,
