@@ -1,32 +1,31 @@
-import React , { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
+
+const BASE = '/core/'
 
 export const useRoute = () => {
-    const [path , setPath] = useState<string>(window.location.pathname)
+  const getPath = () => {
+    const full = window.location.pathname
+    // убираем basename из пути: '/core/form' → '/form'
+    return full.startsWith(BASE.slice(0, -1))
+      ? full.slice(BASE.length - 1) || '/'
+      : full
+  }
 
-    useEffect(() => {
-        const onLocationChange = () => {
-            setPath(window.location.pathname)
-        }
-        window.addEventListener('popstate' , onLocationChange)
-        return () => {
-            window.removeEventListener('popstate' , onLocationChange)
-        }
-    } , [])
+  const [path, setPath] = useState<string>(getPath)
 
-    return path
+  useEffect(() => {
+    const onLocationChange = () => setPath(getPath())
+    window.addEventListener('popstate', onLocationChange)
+    return () => window.removeEventListener('popstate', onLocationChange)
+  }, [])
 
+  return path
 }
 
-const Router = ({routes} : {routes : Record<string , string>}) => {
-
-
-    const path = useRoute()
-
-    const Component = routes[path] || routes['*']
-
-    return <Component/>
-
-
+const Router = ({ routes }: { routes: Record<string, React.ComponentType> }) => {
+  const path = useRoute()
+  const Component = routes[path] || routes['*']
+  return <Component />
 }
 
 export default Router

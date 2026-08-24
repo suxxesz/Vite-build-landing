@@ -1,10 +1,11 @@
 import { Fields } from '@/types/form/field.types';
+import ApiData from '@/config'
 
 // Раньше URL был захардкожен как http://localhost:3001 — работает только
 // локально. В проде фронтенд и бэкенд обычно живут на разных origin/портах,
 // поэтому адрес должен приходить из переменной окружения сборки.
 // Vite подставляет её на этапе build; см. frontend/.env.example.
-const BOT_API_URL = import.meta.env.VITE_BOT_API_URL ?? 'http://localhost:3001';
+const BOT_API_URL = ApiData.API_URL
 
 const sendMessage = async (fields: Fields) => {
 

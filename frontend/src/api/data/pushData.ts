@@ -1,8 +1,7 @@
 import {TAsyncData} from '@/types/fetch.types'
+import ApiData from '@/config'
 
-// Раньше URL был захардкожен как http://localhost:3000 — та же проблема,
-// что и в sendMessage.ts. См. frontend/.env.example.
-const MAIN_API_URL = import.meta.env.VITE_MAIN_API_URL ?? 'http://localhost:3001'
+const MAIN_API_URL = ApiData.API_URL
 
 const pushData : TAsyncData<JSON> = async (formData)  => {
   const response = await fetch(`${MAIN_API_URL}/applications`, {
