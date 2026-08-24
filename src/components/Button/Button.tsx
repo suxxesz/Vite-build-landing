@@ -24,21 +24,37 @@ export default (props: ButtonComponentProps) => {
   const safeTarget = target === null ? undefined : target
 
   if (isLink) {
-    const linkOnClick = props.onClick as React.MouseEventHandler<HTMLAnchorElement> | undefined
-    
-    return (
-      <a 
-        className={classNames} 
-        href={href} 
-        target={safeTarget} 
-        title={title}
-        onClick={linkOnClick}
-        {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
-      >
-        {children}
-      </a>
-    )
+  const linkOnClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // внешние ссылки и новые вкладки — не перехватываем
+    if (
+      href.startsWith('http') ||
+      href.startsWith('mailto') ||
+      safeTarget === '_blank'
+    ) {
+      props.onClick?.(e as any)
+      return
+    }
+
+    e.preventDefault()
+    window.history.pushState({}, '', href)
+    // уведомляем Router что путь изменился
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    props.onClick?.(e as any)
   }
+
+  return (
+    <a
+      className={classNames}
+      href={href}
+      target={safeTarget}
+      title={title}
+      onClick={linkOnClick}
+      {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+    >
+      {children}
+    </a>
+  )
+}
   
   const buttonOnClick = props.onClick as React.MouseEventHandler<HTMLButtonElement> | undefined
 

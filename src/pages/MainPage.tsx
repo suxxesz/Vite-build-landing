@@ -64,7 +64,7 @@ const MainPage = () => {
         <Main  children='SUXXESZ' subtitle="Web developer | UI/UX Designer" />
         {createPortal(
           <Overlay>
-            <Button href="/form" className='link' unussual>Write message here...</Button>
+            <Button href="/core/form" className='link' unussual>Write message here...</Button>
           </Overlay>,
           document.body
         )}

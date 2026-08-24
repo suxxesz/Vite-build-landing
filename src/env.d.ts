@@ -36,12 +36,12 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+   readonly BASE_URL: string
 }
 
 declare namespace NodeJS {
    interface ProcessEnv {
     VITE_MAIN_API_URL : string 
-  VITE_BOT_API_URLL :  string
-  VITE_USER_ID :  string
+     VITE_USER_ID :  string
 }
 }
