@@ -1,5 +1,5 @@
-import applicationsRouter from '../routes/application.ts'
-import { client, lastSeenMap } from '../discord/bot.ts'
+import applicationsRouter from '../routes/application'
+import { client, lastSeenMap } from '../discord/bot'
 import type { FastifyInstance } from 'fastify'
 
 /**

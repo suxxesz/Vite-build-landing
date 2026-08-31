@@ -1,2 +1,4 @@
 .env 
-/node_modules
+/node_modules2
+.env.*
+!.env.example

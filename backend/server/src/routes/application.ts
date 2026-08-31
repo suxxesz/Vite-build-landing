@@ -1,6 +1,4 @@
-import db from '../../db.ts'
 import type { FastifyInstance } from 'fastify'
-import type { FastifyRequest } from 'fastify'
 import type { DiscordUser } from '../../shared/types/discord.types.ts'
 
 async function applicationRouter(fastify: FastifyInstance, opts: any) {
@@ -75,7 +73,7 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
     async (request, reply) => {
       const { discord_id, name, email, message } = request.body
 
-      const result = await db.execute({
+      const result = await fastify.db.execute({
         sql: `INSERT INTO applications (discord_id, name, email, message)
               VALUES (?, ?, ?, ?)`,
         args: [
@@ -103,7 +101,7 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
       },
     },
     async (_request, reply) => {
-      const result = await db.execute(
+      const result = await fastify.db.execute(
         'SELECT * FROM applications ORDER BY created_at DESC',
       )
       return result.rows
@@ -127,7 +125,7 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
       const { id }     = request.params
       const { status } = request.body
 
-      const result = await db.execute({
+      const result = await fastify.db.execute({
         sql:  'UPDATE applications SET status = ? WHERE id = ?',
         args: [status, id],
       })

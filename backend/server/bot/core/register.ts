@@ -3,7 +3,7 @@ import {
     createSession,
     getSession,
     updateSession,
-} from "./session/store.ts";
+} from "./session/store";
 import type { FastifyInstance } from "fastify";
 import type { IForm, Session } from "../../../server/shared/types/form.types.ts";
 

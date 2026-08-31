@@ -110,7 +110,6 @@ export default function OverallForm() {
     )
     .to(submitBtnRef.current, { opacity: 1, y: 0, duration: 0.4 }, '-=0.3')
 
-    // Параллакс мыши
     const rotX = gsap.quickTo(asteroid, 'rotationX', { duration: 0.6, ease: 'power3' })
     const rotY = gsap.quickTo(asteroid, 'rotationY', { duration: 0.6, ease: 'power3' })
     
@@ -211,10 +210,10 @@ export default function OverallForm() {
               className={clsx('btn--submit', {
                 'is-loading': submitStatus === 'loading',
                 'is-success': submitStatus === 'success',
-                'disabled': !isValid,
+                'disabled': !isValid || submitStatus === 'success' ,
               })}
               type="submit"
-              aria-disabled={!isValid}
+              isDisabeled={!isValid}
             >
               {buttonLabel}
             </Button>

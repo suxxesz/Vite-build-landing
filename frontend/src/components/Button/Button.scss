@@ -20,4 +20,9 @@
       position: relative ;
       bottom: '4px' ; 
   }
+  &:disabled {
+    cursor: none;
+    background-color: var(--color-gray);
+    opacity: 50%;
+  }
 }
