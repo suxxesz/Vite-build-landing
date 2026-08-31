@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useContext } from 'react'
+import React, { useContext ,  useMemo , memo } from 'react'
 import './Field.scss'
 import { FormContext } from '@/context/FormContext'
 import { TOPICS } from '@/hooks/useForm'
@@ -16,7 +16,8 @@ const customComponents = {
   IndicatorSeparator: () => null,
 }
 
-const selectStyles: StylesConfig<TOption, false> = {
+const selectStyles: StylesConfig<TOption, false> = useMemo(() => {
+  return {
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   control:    (base) => ({ ...base, background: 'transparent', border: 'none', boxShadow: 'none', minHeight: 'unset'  , padding : "5px 0px 0px", fontSize : '14px'}) ,
   menu:       (base) => ({ ...base, background: 'rgba(95, 67, 165, 0.3)', backdropFilter: 'blur(16px)' }),
@@ -33,7 +34,8 @@ const selectStyles: StylesConfig<TOption, false> = {
   singleValue: (base) => ({ ...base, color: '#fff' }),
   placeholder: (base) => ({ ...base, color: 'rgba(255,255,255,0.35)' }),
   input:       (base) => ({ ...base, color: '#fff' }),
-}
+  }
+} , [])
 
 function Field({
   label,
@@ -70,8 +72,10 @@ function Field({
       isSuccess   && 'field__input--success',
     ),
   }
-  const selectValue: TOption | null =
-    topicOptions.find((o) => o.value === value) ?? null
+  const selectValue: TOption | null = useMemo(
+  () => topicOptions.find((o) => o.value === value) ?? null,
+  [value]
+)
 
   return (
     <div
@@ -136,4 +140,4 @@ function Field({
     </div>
   )
 }
-export default React.memo(Field)
+export default memo(Field)

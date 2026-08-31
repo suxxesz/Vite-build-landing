@@ -26,14 +26,24 @@ export default function OverallForm() {
   const fieldsWrapRef = useRef<HTMLDivElement>(null)
   const submitBtnRef = useRef<HTMLDivElement>(null)
 
-  const f = (name: string) => ({
-    value: fields[name].value,
-    errors: fields[name].errors,
-    touched: fields[name].touched,
-    onChange: (val: string | React.ChangeEvent<HTMLInputElement>) =>
-      onChange(name, typeof val === 'string' ? val : val.target.value),
-    onBlur: () => onBlur(name),
-  })
+  const handlers = useMemo(() => {
+    const keys = Object.keys(fields)
+    return Object.fromEntries(
+      keys.map((name) => [
+        name,
+        {
+          value: fields[name].value,
+          errors: fields[name].errors,
+          touched: fields[name].touched,
+          onChange: (val: string | React.ChangeEvent<HTMLInputElement>) =>
+            onChange(name, typeof val === 'string' ? val : val.target.value),
+          onBlur: () => onBlur(name),
+        },
+      ])
+    )
+  }, [fields, onChange, onBlur])
+
+  const f = (name: string) => handlers[name]
 
   const requiredKeys = useMemo(
     () => (Object.keys(RULES) as Array<keyof typeof RULES>).filter((key) => RULES[key]?.required),
@@ -43,14 +53,13 @@ export default function OverallForm() {
     (key) => fields[key].value.trim().length > 0 && fields[key].errors.length === 0
   ).length
 
-  const buttonLabel =
-    submitStatus === 'success' ? (
-      <span className="btn--submit__content"><Check size={18} /> Sent!</span>
-    ) : submitStatus === 'loading' ? (
-      <span className="btn--submit__content"><Loader2 size={18} className="btn--submit__spinner" /> Sending…</span>
-    ) : (
-      'Launch transmission'
-    )
+  const buttonLabel = useMemo(() => {
+    if (submitStatus === 'success')
+      return <span className="btn--submit__content"><Check size={18} /> Sent!</span>
+    if (submitStatus === 'loading')
+      return <span className="btn--submit__content"><Loader2 size={18} className="btn--submit__spinner" /> Sending…</span>
+    return 'Launch transmission'
+  }, [submitStatus])
 
   useGSAP(() => {
     const asteroid = asteroidRef.current
@@ -68,7 +77,11 @@ export default function OverallForm() {
       opacity: 0,
     })
 
-    gsap.set(fieldsWrapRef.current ? Array.from(fieldsWrapRef.current.children) : [], { opacity: 0, y: 14 })
+    const children = fieldsWrapRef.current
+      ? Array.from(fieldsWrapRef.current.children)
+      : []
+
+    gsap.set(children, { opacity: 0, y: 14 })
     gsap.set(submitBtnRef.current, { opacity: 0, y: 10 })
 
     const tl = gsap.timeline({
@@ -77,7 +90,7 @@ export default function OverallForm() {
         start: 'top top',
         end: 'bottom bottom',
         scrub: 1,
-        invalidateOnRefresh: true, 
+        invalidateOnRefresh: true,
       },
       onComplete: () => {
         if (!driftTween) {
@@ -103,16 +116,12 @@ export default function OverallForm() {
       duration: 1,
       ease: 'expo.out',
     })
-    .to(
-      fieldsWrapRef.current ? Array.from(fieldsWrapRef.current.children) : [],
-      { opacity: 1, y: 0, duration: 0.4, stagger: 0.04 },
-      '-=0.6'
-    )
-    .to(submitBtnRef.current, { opacity: 1, y: 0, duration: 0.4 }, '-=0.3')
+      .to(children, { opacity: 1, y: 0, duration: 0.4, stagger: 0.04 }, '-=0.6')
+      .to(submitBtnRef.current, { opacity: 1, y: 0, duration: 0.4 }, '-=0.3')
 
     const rotX = gsap.quickTo(asteroid, 'rotationX', { duration: 0.6, ease: 'power3' })
     const rotY = gsap.quickTo(asteroid, 'rotationY', { duration: 0.6, ease: 'power3' })
-    
+
     const onMove = (e: PointerEvent) => {
       const nx = (e.clientX / window.innerWidth - 0.5) * 2
       const ny = (e.clientY / window.innerHeight - 0.5) * 2
@@ -128,10 +137,19 @@ export default function OverallForm() {
   const burstShell = contextSafe(() => {
     const rect = asteroidRef.current?.getBoundingClientRect()
     if (!rect) return
+
+    const fragment = document.createDocumentFragment()
+    const frags: HTMLElement[] = []
+
     for (let i = 0; i < 22; i++) {
       const frag = document.createElement('div')
       frag.className = 'asteroid-fragment'
-      document.body.appendChild(frag)
+      fragment.appendChild(frag)
+      frags.push(frag)
+    }
+    document.body.appendChild(fragment)
+
+    frags.forEach((frag) => {
       const startX = rect.left + rect.width * Math.random()
       const startY = rect.top + rect.height * Math.random()
       gsap.set(frag, { x: startX, y: startY, opacity: 1, rotation: Math.random() * 360 })
@@ -146,7 +164,8 @@ export default function OverallForm() {
         ease: 'power2.out',
         onComplete: () => frag.remove(),
       })
-    }
+    })
+
     gsap.to(asteroidRef.current, {
       rotationY: '+=360',
       duration: 1.1,
@@ -195,7 +214,7 @@ export default function OverallForm() {
               <Field label="Your email" id="your-email" type="email" icon={<Mail size={16} aria-hidden="true" />} {...f('email')} />
             </div>
             <div className="asteroid__field">
-              <Field label="Topic" id="your-topic" icon={<MessageSquare size={16} aria-hidden="true"  /> } {...f('topic')} isSelect={true} />
+              <Field label="Topic" id="your-topic" icon={<MessageSquare size={16} aria-hidden="true" />} {...f('topic')} isSelect={true} />
             </div>
             <div className="asteroid__field asteroid__field--full">
               <CountrySelect icon={<Globe size={16} aria-hidden="true" />} {...f('country')} />
@@ -210,11 +229,12 @@ export default function OverallForm() {
               className={clsx('btn--submit', {
                 'is-loading': submitStatus === 'loading',
                 'is-success': submitStatus === 'success',
-                'disabled': !isValid || submitStatus === 'success' ,
+                'disabled': !isValid || submitStatus === 'success',
               })}
               type="submit"
               isDisabeled={!isValid}
             >
+
               {buttonLabel}
             </Button>
           </div>

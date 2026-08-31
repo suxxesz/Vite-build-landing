@@ -20,7 +20,7 @@ export default function Widget() {
   )
   return (
     <div className="widget">
-      <Icon src={src} className="widget__image" alt={name} size={70} />
+      <Icon src={src} className="widget__image" alt={name} size={60} />
 
       <div className={clsx("status" , status)}></div>
 
