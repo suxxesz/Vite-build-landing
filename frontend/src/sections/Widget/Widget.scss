@@ -17,7 +17,7 @@
     @include mobile-s {
         width: clamp(200px, 85vw, 320px);
         height: min-content;
-        padding: 4px;
+        padding: 7px;
         gap: 3px;
     }
     
@@ -30,6 +30,12 @@
         @include mobile-s {
                  font-size: 16px;
             }
+        &--wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-items: start;
+        }
     }
     
     &__subname {
@@ -106,15 +112,17 @@
         }
     }
     &__image {
-        width: 70px;
-        height: 70px;
+        width: 60px;
+        height: 60px;
         border-radius: 16px !important;
-        @include mobile-s {
-        width: 50px;
-        height: 50px;
-        padding: 2px;
         position: relative;
-        top: 3px;
+        top: 1px;
+
+        @include mobile-s {
+        width: 52px;
+        height: 52px;
+        padding: 2px;
+        top: 2px;
     }
     }
     &__link {
@@ -142,6 +150,7 @@
     &__time {
         @include mobile-s {
         font-size: 14px;
+        padding-bottom: 10px;
     }
     }
 }
@@ -157,7 +166,7 @@
   left: -20px;
   @include mobile-s {
     top: 20px;
-        left: -40px;
+        left: -20px;
   }
 
   &.online {

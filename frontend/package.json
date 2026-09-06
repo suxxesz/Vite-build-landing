@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview" ,
-    "deploy": "vite build && gh-pages -d dist -b gh-pages --dotfiles"
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages --dist dist --branch gh-pages --repo=https://github.com/suxxesz/core.git"
   },
   "dependencies": {
     "@a1rth/css-normalize": "^1.2.4",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/country-list": "^2.1.4",
+    "@types/node": "^26.4.0",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^4.0.0",

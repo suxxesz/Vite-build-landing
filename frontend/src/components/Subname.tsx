@@ -9,7 +9,7 @@ export default function Subname() {
 
     return (
     <Button className={isCopied ? clsx("widget__subname" , countOfCopy > 9 ? 'shake' : 'is_copied') : "widget__subname"} 
-    onClick={() => {copyOnClipboard(subname) ;  copyState() }} 
+    onClick={() => {copyOnClipboard(subname) ;  copyState }} 
     onPointerLeave={onMouseLeaveCopyState}>
             {subname}
             <div className="widget__subname__hint">{copyInner}</div>

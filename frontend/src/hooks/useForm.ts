@@ -1,31 +1,34 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
+import { useSetAtom } from 'jotai'
+import { sessionIdAtom } from '@/store/store'
 import pushData from '@/api/data/pushData'
 import { TRules } from "@/types/form/rules.types"
-import { Field, Fields , Rules , FieldName} from "@/types/form/field.types"
+import { Field, Fields, Rules, FieldName } from "@/types/form/field.types"
 import { Toast } from "@/types/form/field.types"
-import { TFormContext } from "@/types/form/formContext.types"
 import sendMessage from "@/api/send/sendMessage"
 
-const DRAFT_KEY : string = 'form_draft'
+const DRAFT_KEY: string = 'form_draft'
 
-export const RULES : TRules = {
-  name:    { min: 2,  max: 30,   required: true },
-  subname: { min: 2,  max: 30,   required: true },
-  email:   { min: 5,  max: 50,   required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Invalid email format' },
-  topic:   { required: true },
-  country: { min: 2,  max: 50,   required: false },
+export const RULES: TRules = {
+  name: { min: 2, max: 30, required: true },
+  subname: { min: 2, max: 30, required: true },
+  email: { min: 5, max: 50, required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, patternMessage: 'Invalid email format' },
+  topic: { required: true },
+  country: { min: 2, max: 50, required: false },
   message: { min: 10, max: 5000, required: true },
 } as const
 
 export const TOPICS = [
-  { value: 'question',     label: 'Question' },
-  { value: 'bug',          label: 'Bug report' },
-  { value: 'collab',       label: 'Collaboration' },
-  { value: 'other',        label: 'Other' },
-] as const 
+  { value: 'question', label: 'Question' },
+  { value: 'bug', label: 'Bug report' },
+  { value: 'collab', label: 'Collaboration' },
+  { value: 'other', label: 'Other' },
+] as const
 
-
-const validateField = (value: string, rules?: Rules<typeof RULES>[FieldName]): string[] => {
+const validateField = (
+  value: string,
+  rules?: Rules<typeof RULES>[FieldName]
+): string[] => {
   if (!rules) return []
   const errors: string[] = []
   const { required, min, max, pattern, patternMessage } = rules as any
@@ -40,7 +43,20 @@ const validateField = (value: string, rules?: Rules<typeof RULES>[FieldName]): s
   return errors
 }
 
-const makeField = (value = ''): Field => ({ value, errors: [], touched: false })
+const makeField = (value = ''): Field => ({
+  value,
+  errors: [],
+  touched: false,
+})
+
+const INITIAL_FIELDS: Fields = {
+  name: makeField(),
+  subname: makeField(),
+  email: makeField(),
+  topic: makeField(),
+  country: makeField(),
+  message: makeField(),
+}
 
 const loadDraft = (): Fields => {
   try {
@@ -63,20 +79,15 @@ const loadDraft = (): Fields => {
   }
 }
 
-const INITIAL_FIELDS: Fields = {
-  name:    makeField(),
-  subname: makeField(),
-  email:   makeField(),
-  topic:   makeField(),
-  country: makeField(),
-  message: makeField(),
-}
-
 const useForm = () => {
   const [fields, setFields] = useState<Fields>(loadDraft)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [toast, setToast] = useState<Toast>(null)
 
+  // ── записываем sessionId глобально через атом ──────────────────────────
+  const setSessionId = useSetAtom(sessionIdAtom)
+
+  // ── сохранение черновика ───────────────────────────────────────────────
   useEffect(() => {
     if (submitStatus === 'success') return
     const draft = Object.fromEntries(
@@ -87,31 +98,37 @@ const useForm = () => {
 
   const onChange = useCallback((fieldName: FieldName, value: string) => {
     const errors = validateField(value, RULES[fieldName])
-    setFields(prev => ({ ...prev, [fieldName]: { ...prev[fieldName], value, errors } }))
+    setFields(prev => ({
+      ...prev,
+      [fieldName]: { ...prev[fieldName], value, errors },
+    }))
   }, [])
 
   const onBlur = useCallback((fieldName: FieldName) => {
-    setFields(prev => ({ ...prev, [fieldName]: { ...prev[fieldName], touched: true } }))
+    setFields(prev => ({
+      ...prev,
+      [fieldName]: { ...prev[fieldName], touched: true },
+    }))
   }, [])
 
   const isValid = useMemo(() =>
-    (Object.entries(RULES) as Array<[FieldName, Rules<Partial<typeof RULES>>[FieldName]]>).every(([key, rules]) => {
-      if (!rules || !rules.required) return true
-      return fields[key].value.trim() && fields[key].errors.length === 0
-    }),
-  [fields])
+    (Object.entries(RULES) as Array<[FieldName, Rules<Partial<typeof RULES>>[FieldName]]>)
+      .every(([key, rules]) => {
+        if (!rules || !rules.required) return true
+        return fields[key].value.trim() && fields[key].errors.length === 0
+      }),
+    [fields])
 
-
-  const countOfWords = useMemo(() =>  {
-    return Number(`${fields.message.value.length}/${RULES.message.max}`) || '0/5000'
-  }, [fields.message.value])
+  const countOfWords = useMemo(() =>
+    Number(`${fields.message.value.length}/${RULES.message.max}`) || '0/5000',
+    [fields.message.value])
 
   const validationError = useMemo(() => {
     for (const key of Object.keys(RULES) as FieldName[]) {
       const rules = RULES[key]
       if (!rules || !rules.required) continue
       const field = fields[key]
-      if (!field.value.trim()){
+      if (!field.value.trim()) {
         const parsedKey = key[0].toUpperCase() + key.slice(1)
         return `"${parsedKey}" is required`
       }
@@ -139,30 +156,40 @@ const useForm = () => {
     setSubmitStatus('loading')
 
     try {
-      await pushData({
-        name:    fields.name.value,
+      const result = await pushData({
+        name: fields.name.value,
         subname: fields.subname.value,
-        email:   fields.email.value,
-        topic:   fields.topic.value,
+        email: fields.email.value,
+        topic: fields.topic.value,
         country: fields.country.value,
         message: fields.message.value,
       })
-      const response = await sendMessage(fields)
 
-      if(!response.ok) {
-       console.log('Something was occured while sending data' , response)
+      if (result?.sessionId) {
+        setSessionId(result.sessionId)
       }
 
       setSubmitStatus('success')
-      setToast({ type: 'success', text: 'Message sent! I\'ll get back to you soon.' })
+      setToast({ type: 'success', text: "Message sent! I'll get back to you soon." })
       localStorage.removeItem(DRAFT_KEY)
+
     } catch (err) {
       setSubmitStatus('error')
       setToast({ type: 'error', text: 'Something went wrong. Please try again.' })
     }
-  }, [fields, isValid, validationError])
+  }, [fields, isValid, validationError, setSessionId])
 
-  return { fields, onChange, onBlur, onSubmit, isValid, submitStatus, countOfWords, toast, setToast } as TFormContext
+  return {
+    fields,
+    onChange,
+    onBlur,
+    onSubmit,
+    isValid,
+    submitStatus,
+    countOfWords,
+    toast,
+    setToast,
+  }
 }
 
 export default useForm

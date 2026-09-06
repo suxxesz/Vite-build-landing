@@ -1,32 +1,47 @@
-import {TAsyncData} from '@/types/fetch.types'
 import ApiData from '@/config'
+const API_URL = ApiData.API_URL
 
-const MAIN_API_URL = ApiData.API_URL
 
-const pushData : TAsyncData<JSON> = async (formData)  => {
-  const response = await fetch(`${MAIN_API_URL}/applications`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name:      formData.name,
-      email:     formData.email,
-      discord_id: null,
-      message:   [
-        `Surname: ${formData.subname}`,
-        `Topic: ${formData.topic}`,
-        `Country: ${formData.country || '—'}`,
-        '',
-        formData.message,
-      ].join('\n'),
-    }),
-  })
+export interface PushDataResponse {
+    success:   boolean
+    sessionId: string
+}
 
-  if (!response.ok) {
-    const data = await response.json()
-    throw new Error(data.error || 'Server error')
-  }
+interface FormPayload {
+    name:    string
+    subname: string
+    email:   string
+    topic:   string
+    country: string
+    message: string
+}
 
-  return response.json() as Promise<JSON>
+const pushData = async (
+    formData: FormPayload
+): Promise<PushDataResponse> => {
+
+    const response = await fetch(
+        `${API_URL}/api/message`,
+        {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name:    { value: formData.name },
+                subname: { value: formData.subname },
+                email:   { value: formData.email },
+                topic:   { value: formData.topic },
+                country: { value: formData.country },
+                message: { value: formData.message },
+            }),
+        }
+    )
+
+    if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Server error')
+    }
+
+    return response.json() as Promise<PushDataResponse>
 }
 
 export default pushData

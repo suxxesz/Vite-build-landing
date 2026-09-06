@@ -9,17 +9,13 @@ body {
 
 .dark-theme-animation-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0; 
   overflow: hidden;
   pointer-events: none; 
 }
 
 .dark-theme-switcher-circle {
   position: absolute;
-
   width: 350vmax; 
   height: 350vmax;
   border-radius: 50%;
@@ -40,7 +36,8 @@ body {
 .dark-theme-switcher {
   width: 44px;
   height: 44px;
-  margin: 20px;
+  margin: 0; 
+  flex-shrink: 0;
   color: var(--color-light);
   display: flex;
   align-items: center;
@@ -59,7 +56,7 @@ body {
     width: 44px !important;
     height: 44px !important;
     pointer-events: none; 
-    filter : var(--drop-shadow);
+    filter: var(--drop-shadow);
     color: var(--color-light);
   }
 }

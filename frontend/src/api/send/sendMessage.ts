@@ -1,3 +1,4 @@
+//@ts-ignore
 import { Fields } from '@/types/form/field.types';
 import ApiData from '@/config'
 

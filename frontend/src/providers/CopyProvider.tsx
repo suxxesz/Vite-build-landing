@@ -26,7 +26,6 @@ export default function CopyProvider({ children } : { children: React.ReactNode 
     const fetchUser : () => Promise<void> = async () => {
       try {
         const data = await getRawDiscordData(
-          API_URL,
           USER_ID
         ) as {
           status?: string

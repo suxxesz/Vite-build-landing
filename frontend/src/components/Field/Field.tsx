@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import React, { useContext ,  useMemo , memo } from 'react'
+import React, { useContext , useCallback , memo, useMemo } from 'react'
 import './Field.scss'
 import { FormContext } from '@/context/FormContext'
 import { TOPICS } from '@/hooks/useForm'
@@ -16,12 +16,65 @@ const customComponents = {
   IndicatorSeparator: () => null,
 }
 
-const selectStyles: StylesConfig<TOption, false> = useMemo(() => {
-  return {
+const selectStyles: StylesConfig<TOption, false> = {
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-  control:    (base) => ({ ...base, background: 'transparent', border: 'none', boxShadow: 'none', minHeight: 'unset'  , padding : "5px 0px 0px", fontSize : '14px'}) ,
-  menu:       (base) => ({ ...base, background: 'rgba(95, 67, 165, 0.3)', backdropFilter: 'blur(16px)' }),
-  option:     (base, state) => ({
+  
+  control: (base) => ({
+    ...base,
+    background: 'transparent',
+    border: 'none',
+    boxShadow: 'none',
+    minHeight: 'unset',
+    height: '100%',
+    padding: 0,
+    fontSize: '14px',
+    display: 'flex',
+    alignItems: 'center',
+  }),
+
+  // Контейнер, где лежит текст выбранного значения
+  valueContainer: (base) => ({
+    ...base,
+    display: 'flex',
+    alignItems: 'start',
+    // Выставляем 56px по бокам на десктопе и 0px на мобилках (до 768px)
+    padding: '0 56px',
+    '@media (max-width: 768px)': {
+      padding: '0 0px',
+    },
+  }),
+
+  // Сам текст значения (убираем стандартные margin и абсолютные сдвиги)
+  singleValue: (base) => ({
+    ...base,
+    color: '#fff',
+    margin: 0,
+    position: 'relative',
+    transform: 'none',
+    maxWidth: '100%',
+  }),
+
+  // Инпут ввода при поиске/фокусе
+  input: (base) => ({
+    ...base,
+    color: '#fff',
+    margin: 0,
+    padding: 0,
+  }),
+
+  placeholder: (base) => ({
+    ...base,
+    color: 'rgba(255,255,255,0.35)',
+    margin: 0,
+  }),
+
+  menu: (base) => ({
+    ...base,
+    background: 'rgba(95, 67, 165, 0.3)',
+    backdropFilter: 'blur(16px)',
+  }),
+
+  option: (base, state) => ({
     ...base,
     background: state.isSelected
       ? 'rgba(29, 18, 18, 0.14)'
@@ -31,11 +84,7 @@ const selectStyles: StylesConfig<TOption, false> = useMemo(() => {
     color: state.isSelected ? '#fff' : 'rgba(255,255,255,0.7)',
     cursor: 'pointer',
   }),
-  singleValue: (base) => ({ ...base, color: '#fff' }),
-  placeholder: (base) => ({ ...base, color: 'rgba(255,255,255,0.35)' }),
-  input:       (base) => ({ ...base, color: '#fff' }),
-  }
-} , [])
+}
 
 function Field({
   label,

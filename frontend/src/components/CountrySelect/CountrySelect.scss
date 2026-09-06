@@ -9,7 +9,7 @@ $purple-light: rgba(138, 96, 245, 0.12);
   &__control {
     height: 50px;
     min-height: 50px;
-    padding-inline: 16px;
+    padding-inline: 16px; 
     background-color: transparent !important;
     background-repeat: no-repeat;
     background-position: calc(100% - 16px) 50%;
@@ -24,6 +24,9 @@ $purple-light: rgba(138, 96, 245, 0.12);
 
     &:hover {
       border-color: var(--color-purple, var(--color-purple-2)) !important;
+    }
+    &:first-child {
+      padding-block: 0px;
     }
 
     &--is-focused {

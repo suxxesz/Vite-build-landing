@@ -8,30 +8,26 @@ const PHRASES = ['scroll', 'more...', "pretty, isn't it?", 'not enough', 'closer
 
 function makeTextTexture(text: string) {
   const canvas = document.createElement('canvas')
-  canvas.width = 1024
-  canvas.height = 220
+  canvas.width = 1536
+  canvas.height = 340
   const ctx = canvas.getContext('2d')
   if (!ctx) return null
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.font = '700 100px "Segoe UI", -apple-system, sans-serif'
+  ctx.font = '800 350px "Segoe UI", -apple-system, sans-serif'
 
-  ctx.shadowColor = '#8a60f5'
-  ctx.shadowBlur = 55
-  ctx.fillStyle = '#c9b8ff'
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2)
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+  const cx = canvas.width / 2
+  const cy = canvas.height / 2
 
-  ctx.shadowColor = '#5ecbff'
-  ctx.shadowBlur = 25
+  ctx.lineJoin = 'round'
+  ctx.lineWidth = 14
+  ctx.strokeStyle = '#3a1f7a'
+  ctx.strokeText(text, cx, cy)
+
   ctx.fillStyle = '#ffffff'
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2)
-
-  ctx.shadowBlur = 0
-  ctx.fillStyle = '#ffffff'
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+  ctx.fillText(text, cx, cy)
 
   const tex = new THREE.CanvasTexture(canvas)
   tex.needsUpdate = true
@@ -64,7 +60,7 @@ export default function ScrollGuide() {
 
     let W = window.innerWidth
     let H = window.innerHeight
-    if (W === 0 || H === 0) return 
+    if (W === 0 || H === 0) return
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const mouse = { nx: 0, ny: 0 }
@@ -113,12 +109,28 @@ export default function ScrollGuide() {
       )
     }
 
+    // отдельный ореол ПОД текстом — усиливает заметность независимо от маяка
+    const textHaloTex = makeGlowTexture('rgba(148,110,255,.85)', 'rgba(94,203,255,.2)')
+    const textHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: textHaloTex ?? undefined, transparent: true, depthWrite: false,
+      blending: THREE.AdditiveBlending, opacity: 0.55,
+    }))
+    textHalo.scale.set(52, 52, 1)
+    textHalo.position.set(0, -12, -301)
+    scene.add(textHalo)
+    if (!reducedMotion) {
+      breatheTweens.push(
+        gsap.to(textHalo.scale, { x: '+=8', y: '+=8', duration: 2.0, ease: 'sine.inOut', yoyo: true, repeat: -1 })
+      )
+    }
+
     let phraseIndex = -1
     const textMat = new THREE.SpriteMaterial({
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 1,
     })
     const textSprite = new THREE.Sprite(textMat)
-    textSprite.scale.set(30, 6.5, 1)
+    // спрайт текста вырос почти в 1.5 раза, пропорции канваса сохранены (1536/340 ≈ 46/10)
+    textSprite.scale.set(46, 10, 1)
     textSprite.position.set(0, -12, -300)
     scene.add(textSprite)
 
@@ -131,7 +143,8 @@ export default function ScrollGuide() {
       textMat.map = tex
       textMat.needsUpdate = true
       if (!reducedMotion) {
-        gsap.fromTo(textSprite.scale, { x: 26, y: 5.6 }, { x: 30, y: 6.5, duration: 0.5, ease: 'back.out(2)' })
+        gsap.fromTo(textSprite.scale, { x: 40, y: 8.7 }, { x: 46, y: 10, duration: 0.5, ease: 'back.out(2)' })
+        gsap.fromTo(textHalo.scale, { x: 44, y: 44 }, { x: 52, y: 52, duration: 0.5, ease: 'back.out(2)' })
       }
     }
     setPhrase(0)
@@ -152,9 +165,11 @@ export default function ScrollGuide() {
       const idx = Math.min(PHRASES.length - 1, Math.floor(p * PHRASES.length * 1.15))
       setPhrase(idx)
       textSprite.position.z = -300 + p * 260
+      textHalo.position.z = -301 + p * 260
 
       const textFade = p > 0.75 ? Math.max(0, 1 - (p - 0.75) / 0.2) : 1
-      textMat.opacity = textFade * 0.9
+      textMat.opacity = textFade
+      textHalo.material.opacity = textFade * 0.55
 
       const beaconFade = p > 0.7 ? Math.max(0, 1 - (p - 0.7) / 0.3) : 1
       core.material.opacity = beaconFade * 0.9
@@ -189,7 +204,9 @@ export default function ScrollGuide() {
         camera.position.x += (mouse.nx * 10 - camera.position.x) * 0.02
         camera.position.y += (8 - mouse.ny * 6 - camera.position.y) * 0.02
         camera.lookAt(0, 0, 0)
-        textSprite.position.y = -12 + Math.sin(performance.now() * 0.0012) * 1.6
+        const bob = Math.sin(performance.now() * 0.0012) * 1.6
+        textSprite.position.y = -12 + bob
+        textHalo.position.y = -12 + bob
       }
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(tick)
@@ -205,9 +222,11 @@ export default function ScrollGuide() {
       breatheTweens.forEach((tw) => tw.kill())
       coreTex?.dispose()
       haloTex?.dispose()
+      textHaloTex?.dispose()
       textMat.map?.dispose()
       core.material.dispose()
       halo.material.dispose()
+      textHalo.material.dispose()
       textMat.dispose()
       renderer.dispose()
     }

@@ -1,0 +1,324 @@
+@use '../../styles/helpers' as *;
+
+.notif {
+    position: relative;
+
+    &__trigger {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        border-radius: var(--border-radius);
+        background: transparent;
+        border: none;
+        color: var(--color-black);
+        transition: color var(--transition-duration);
+
+        html.is-dark-theme & { color: var(--color-white); }
+
+        @include hover { color: var(--color-purple); }
+    }
+
+    &__badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--color-dnd);
+        border: 1.5px solid var(--color-black);
+        animation: pulse-dot 2s ease-in-out infinite;
+
+        html.is-dark-theme & { border-color: #0a0814; }
+    }
+
+    &__backdrop {
+        display: none;
+
+        @include mobile {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 199;
+            background: rgba(0, 0, 0, 0.45);
+            animation: fadeIn .2s ease forwards;
+        }
+    }
+
+    &__dropdown {
+        @include backdrop;
+
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        z-index: 200;
+        width: 300px;
+        max-width: calc(100dvw - 24px);
+        border-radius: var(--border-radius-l);
+        overflow: hidden;
+        animation: slideUp .2s ease forwards;
+
+        html.is-dark-theme & {
+            background: rgba(10, 8, 20, 0.95);
+            border-color: rgba(255, 255, 255, 0.07);
+        }
+
+        @include mobile {
+            position: fixed;
+            top: auto;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: var(--border-radius-l) var(--border-radius-l) 0 0;
+            animation: slideUpSheet .25s ease forwards;
+        }
+
+        &::before { @include glow-border(1px); }
+    }
+
+    &__dropdown-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    &__dropdown-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-black);
+
+        html.is-dark-theme & { color: var(--color-accent); }
+    }
+
+    &__dropdown-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    &__dropdown-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px;
+        border-radius: var(--border-radius-xxxs);
+        border: none;
+        background: transparent;
+        color: var(--color-gray);
+        transition: color var(--transition-duration);
+
+        @include hover { color: var(--color-dnd); }
+    }
+
+    &__clear {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px 5px;
+        border-radius: var(--border-radius-xxxs);
+        border: 1px solid rgba(240, 71, 71, 0.35);
+        background: rgba(240, 71, 71, 0.12);
+        color: var(--color-dnd);
+        transition:
+            color var(--transition-duration),
+            background var(--transition-duration),
+            opacity var(--transition-duration);
+
+        @include hover {
+            background: rgba(240, 71, 71, 0.25);
+            color: var(--color-dnd);
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--color-gray);
+        }
+    }
+
+    &__dropdown-body {
+        padding: 12px 14px 14px;
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        /* Полное скрытие полосы прокрутки при сохранении функции скролла */
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        @include mobile {
+            max-height: calc(80vh - 52px);
+        }
+    }
+
+    &__confirm {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 24px 18px;
+        text-align: center;
+
+        &-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-black);
+
+            html.is-dark-theme & { color: var(--color-white); }
+        }
+
+        &-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        &-cancel,
+        &-delete {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition:
+                background var(--transition-duration),
+                border-color var(--transition-duration);
+        }
+
+        &-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--color-gray);
+
+            @include hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--color-black);
+
+                html.is-dark-theme & { color: var(--color-white); }
+            }
+        }
+
+        &-delete {
+            background: rgba(240, 71, 71, 0.15);
+            border-color: rgba(240, 71, 71, 0.4);
+            color: var(--color-dnd);
+
+            @include hover {
+                background: rgba(240, 71, 71, 0.3);
+            }
+        }
+    }
+
+    &__card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 12px;
+    }
+
+    &__status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 8px;
+        border-radius: var(--border-radius-xs);
+        font-size: 11px;
+        font-weight: 600;
+        width: fit-content;
+
+        &--pending {
+            background: rgba(250, 166, 26, 0.15);
+            color: var(--color-idle);
+            border: 1px solid rgba(250, 166, 26, 0.25);
+        }
+        &--accepted {
+            background: rgba(67, 181, 129, 0.15);
+            color: var(--color-green);
+            border: 1px solid rgba(67, 181, 129, 0.25);
+        }
+        &--rejected {
+            background: rgba(240, 71, 71, 0.15);
+            color: var(--color-dnd);
+            border: 1px solid rgba(240, 71, 71, 0.25);
+        }
+    }
+
+    &__text {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--color-black);
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+
+        html.is-dark-theme & { color: var(--color-white); }
+    }
+
+    &__date {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--color-gray);
+    }
+
+    &__read {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--color-green);
+    }
+
+    &__history {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        &-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-gray);
+            margin-bottom: 2px;
+        }
+
+        &-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+    }
+
+    &__empty {
+        font-size: 13px;
+        color: var(--color-gray);
+        text-align: center;
+        padding-block: 8px;
+    }
+}

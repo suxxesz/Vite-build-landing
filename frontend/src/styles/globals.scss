@@ -12,6 +12,7 @@ body {
 
   display: flex;
   flex-direction: column;
+  align-self: center;
   font-family: var(--font-family-base), sans-serif;
   color: var(--color-white);
   background-color: var(--color-black);
@@ -111,16 +112,19 @@ input {
   cursor: url('/cursor.png'), auto;
 }
 .icon-switcher {
-        background-color: transparent;
-        border: none;
-        animation: glowPulse 12.5s infinite ease-in-out infinite;
-        fill: var(--color-black);
-        stroke: var(--color-black);
-        filter: var(--drop-shadow);
-      html.is-dark-theme & {
+    background-color: transparent;
+    border: none;
+    fill: var(--color-black);
+    stroke: var(--color-black);
+    stroke-width: 1.75;
+    filter: var(--drop-shadow);
+    transition: stroke var(--transition-duration) ease,
+                filter var(--transition-duration) ease;
+
+    html.is-dark-theme & {
+        stroke: var(--color-white);
         fill: var(--color-white);
-         filter: var(--drop-shadow);
-         stroke: var(--color-white);
+    }
   @include hover {
         color: var(--color-accent);
     }
@@ -128,8 +132,8 @@ input {
         color: var(--color-accent);
         transform: scale(0.9);
     }
-    }
 }
+
 .link {
   color: var(--color-black);
 
@@ -145,4 +149,32 @@ input {
 }
 .input--error {
   border-color: red;
+}
+
+@keyframes focusPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 2px var(--color-purple-2),
+            0 0 8px 2px var(--color-violet),
+            0 0 18px 6px var(--color-violet);
+    }
+    50% {
+        box-shadow:
+            0 0 0 2px var(--color-purple-3),
+            0 0 14px 5px var(--color-violet),
+            0 0 30px 12px var(--color-violet);
+    }
+}
+
+:focus-visible {
+    outline: none;
+    border-radius: var(--border-radius-xxs);
+    animation: focusPulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :focus-visible {
+        animation: none;
+        box-shadow: 0 0 0 2px var(--color-purple-2), 0 0 14px 5px var(--color-violet);
+    }
 }

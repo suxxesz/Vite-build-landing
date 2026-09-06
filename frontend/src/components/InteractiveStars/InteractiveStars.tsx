@@ -2,22 +2,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import './InteractiveStars.scss'
-
-type TrailPoint = { x: number; y: number }
-
-type Comet = {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  radius: number
-  life: number
-  caught: boolean
-  color: string
-  trail: TrailPoint[]
-}
-
-type BgStar = { x: number; y: number; r: number; phase: number; speed: number }
+import {Comet , BgStar} from '@/types/componets/interactivestars.types'
 
 const CATCH_RADIUS = 150
 const EXPLODE_DELAY = 0.55
