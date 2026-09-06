@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>suxxesz</title>
+  <script type="module" crossorigin src="/core/assets/index-CrEnGQjU.js"></script>
+  <link rel="stylesheet" crossorigin href="/core/assets/index-CC0PvosS.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script>
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark-theme') {
+      document.documentElement.classList.add('dark-theme');
+    }
+
+    const text = "SuxxesZ";
+    let index = text.length;
+    let deleting = true;
+
+    setInterval(() => {
+      document.title = text.slice(0, Math.max(1 , index));
+
+      if (deleting) {
+        index--;
+        if (index < 0) {
+          deleting = false;
+          index = 1;
+        }
+      } else {
+        index++;
+        if (index > text.length) {
+          deleting = true;
+          index = text.length - 1;
+        }
+      }
+    }, 700);
+  </script>
+</body>
+
+</html>
