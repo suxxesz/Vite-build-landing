@@ -1,32 +1,31 @@
-import type { Session } from '../../../../server/shared/types/form.types.ts';
+import type { Session } from '.../../../server/shared/types/form.types.ts';
 
-const sessions = new Map();
+const sessions = new Map<string, Session>();
 
-export function createSession(id : string , data : Session ) {
-    sessions.set(id, data);
+export function createSession(id: string, session: Session): void {
+    sessions.set(id, session);
 }
 
-export function getSession(id : string ) {
+export function getSession(id: string): Session | undefined {
     return sessions.get(id);
 }
 
-export function updateSession(id : string , patch : Partial<Session>) {
-
+export function updateSession(
+    id: string,
+    patch: Partial<Session>
+): Session | undefined {
     const session = sessions.get(id);
 
-    if (!session) return;
+    if (!session) {
+        return undefined;
+    }
 
-    sessions.set(id, {
-        ...session,
-        ...patch
-    });
+    const updated = { ...session, ...patch };
+    sessions.set(id, updated);
 
+    return updated;
 }
 
-export function removeSession(id : string ) {
-    sessions.delete(id);
-}
-
-export function getAllSessions() {
-    return [...sessions.values()];
+export function deleteSession(id: string): boolean {
+    return sessions.delete(id);
 }

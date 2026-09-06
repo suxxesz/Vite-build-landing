@@ -18,6 +18,7 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
         type: 'object',
         properties: {
           id:      { type: 'number' },
+          sessionId : {type : 'string'} , 
           message: { type: 'string' },
         },
       },
@@ -86,6 +87,7 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
 
       return reply.code(201).send({
         id:      Number(result.lastInsertRowid),
+        sessionId: String(result.lastInsertRowid), 
         message: 'Заявка принята',
       })
     },
