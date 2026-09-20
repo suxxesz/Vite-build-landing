@@ -1,13 +1,14 @@
 {
-  "name": "core",
+  "name": "Vite-build-landing",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages --dist dist --branch gh-pages --repo=https://github.com/suxxesz/core.git"
+    "predeploy": "npm run build && node -e \"require('fs').copyFileSync('dist/index.html', 'dist/404.html')\"",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@a1rth/css-normalize": "^1.2.4",

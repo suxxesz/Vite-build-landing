@@ -5,6 +5,6 @@ export interface DiscordUser {
     globalName: string | null
     avatar: string
     status: 'online' | 'idle' | 'dnd' | 'offline'
-    lastSeen: number | null
-
+    lastSeen: number | null , 
+    activities : any[]
 }

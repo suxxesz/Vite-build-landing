@@ -3,23 +3,35 @@
 .header {
     width: 100%;
     max-width: 100%;
-    box-sizing: border-box; // Гарантирует, что padding-inline не увеличивает общую ширину 100%
+
+    box-sizing: border-box;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-inline: 20px;
+
     gap: 5px;
-    margin-block: 16px; 
+
+    margin-block: 10px;
+    margin-inline: 0;
+
+    min-width: 0;
+    overflow: visible;
 
     @include mobile {
         margin-bottom: 12px;
         padding-inline: 8px;
     }
+
     &__right {
         display: flex;
         align-items: center;
-        gap: 8px;
+        align-self: flex-start;
+
         margin-left: auto;
-        flex-shrink: 0; // Запрещает правой секции выпадать за границы шапки
+        margin-right: 0;
+
+        flex-shrink: 0;
+        min-width: 0;
     }
 }

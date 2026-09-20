@@ -17,9 +17,9 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
       201: {
         type: 'object',
         properties: {
-          id:      { type: 'number' },
-          sessionId : {type : 'string'} , 
-          message: { type: 'string' },
+          id:        { type: 'number' },
+          sessionId: { type: 'string' },
+          message:   { type: 'string' },
         },
       },
     },
@@ -50,9 +50,11 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
     },
   }
 
+  // Единый обработчик ошибок для всего плагина —
+  // ловит всё, что не поймано локальным try/catch в роуте
   fastify.setErrorHandler(async function (error, request, reply) {
     request.log.error(error, 'an error happened in Fastify Instance!')
-    reply.status(503).send({ ok: false })
+    reply.status(503).send({ success: false, error: 'Service unavailable' })
   })
 
   // ── POST / ──────────────────────────────────────────────────────────────────
@@ -64,49 +66,47 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
     }
   }>(
     '/',
-    {
-      schema: postSchema,
-      errorHandler: async function (error, request, reply) {
-        request.log.error(error, 'error occured while posting data!')
-        return { success: false, status: 403 }
-      },
-    },
+    { schema: postSchema },
     async (request, reply) => {
-      const { discord_id, name, email, message } = request.body
+      try {
+        const { discord_id, name, email, message } = request.body
 
-      const result = await fastify.db.execute({
-        sql: `INSERT INTO applications (discord_id, name, email, message)
-              VALUES (?, ?, ?, ?)`,
-        args: [
-          discord_id?.trim() || null,
-          name.trim(),
-          email.trim().toLowerCase(),
-          message.trim(),
-        ],
-      })
+        const result = await fastify.db.execute({
+          sql: `INSERT INTO applications (discord_id, name, email, message)
+                VALUES (?, ?, ?, ?)`,
+          args: [
+            discord_id?.trim() || null,
+            name.trim(),
+            email.trim().toLowerCase(),
+            message.trim(),
+          ],
+        })
 
-      return reply.code(201).send({
-        id:      Number(result.lastInsertRowid),
-        sessionId: String(result.lastInsertRowid), 
-        message: 'Заявка принята',
-      })
+        return reply.code(201).send({
+          id:        Number(result.lastInsertRowid),
+          sessionId: String(result.lastInsertRowid),
+          message:   'Заявка принята',
+        })
+      } catch (error) {
+        request.log.error(error, 'error occured while posting data!')
+        return reply.code(400).send({ success: false, error: 'Failed to create application' })
+      }
     },
   )
 
   // ── GET / ───────────────────────────────────────────────────────────────────
   fastify.get(
     '/',
-    {
-      errorHandler: async function (error, request, reply) {
+    async (request, reply) => {
+      try {
+        const result = await fastify.db.execute(
+          'SELECT * FROM applications ORDER BY created_at DESC',
+        )
+        return result.rows
+      } catch (error) {
         request.log.error(error, 'error occured while getting data!')
-        return { success: false, status: 403 }
-      },
-    },
-    async (_request, reply) => {
-      const result = await fastify.db.execute(
-        'SELECT * FROM applications ORDER BY created_at DESC',
-      )
-      return result.rows
+        return reply.code(400).send({ success: false, error: 'Failed to fetch applications' })
+      }
     },
   )
 
@@ -116,30 +116,29 @@ async function applicationRouter(fastify: FastifyInstance, opts: any) {
     Body:   { status: 'pending' | 'approved' | 'rejected' }
   }>(
     '/:id/status',
-    {
-      schema: patchSchema,
-      errorHandler: async function (error, request, reply) {
-        request.log.error(error, 'error occured while patching data!')
-        return { success: false, status: 403 }
-      },
-    },
+    { schema: patchSchema },
     async (request, reply) => {
-      const { id }     = request.params
-      const { status } = request.body
+      try {
+        const { id }     = request.params
+        const { status } = request.body
 
-      const result = await fastify.db.execute({
-        sql:  'UPDATE applications SET status = ? WHERE id = ?',
-        args: [status, id],
-      })
+        const result = await fastify.db.execute({
+          sql:  'UPDATE applications SET status = ? WHERE id = ?',
+          args: [status, id],
+        })
 
-      if (result.rowsAffected === 0) {
-        throw new Error('Application not found')
-      }
+        if (result.rowsAffected === 0) {
+          return reply.code(404).send({ success: false, error: 'Application not found' })
+        }
 
-      return {
-        id:      Number(id),
-        status,
-        message: 'Статус обновлен!',
+        return reply.code(200).send({
+          id: Number(id),
+          status,
+          message: 'Статус обновлен!',
+        })
+      } catch (error) {
+        request.log.error(error, 'error occured while patching data!')
+        return reply.code(400).send({ success: false, error: 'Failed to update status' })
       }
     },
   )

@@ -27,6 +27,7 @@ client.once('clientReady', (readyClient) => {
 
 export function getUserWidgetData(userId : string) {
   const member = client.guilds.cache.map(g => g.members.cache.get(userId)).find(m => m !== undefined)
+
   
   if (!member) {
     return { error: 'Пользователь не найден на серверах бота' }
@@ -39,6 +40,7 @@ export function getUserWidgetData(userId : string) {
     username: member.user.username,
     avatar: member.user.displayAvatarURL({ extension: 'png', size: 128 }),
     status: currentStatus,
-    lastSeen: currentStatus === 'offline' ? (lastSeenMap.get(userId) || null) : null
+    lastSeen: currentStatus === 'offline' ? (lastSeenMap.get(userId) || null) : null ,
+    activities : member.presence?.activities ?? []
   }
 }

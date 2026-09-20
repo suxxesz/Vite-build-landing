@@ -4,140 +4,228 @@ $purpleShadow: rgba(120, 80, 255, .12);
 
 .overlay {
     position: fixed;
+
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%) translateY(100%);
-    
-    // Адаптивная ширина: растягивается, но оставляет отступы по 16px с краев на маленьких экранах
+
     width: calc(100% - 32px);
     max-width: 500px;
+
     height: 100px;
+
     margin: 0 0 2dvh 0;
+
+    transform:
+        translateX(-50%)
+        translateY(calc(100% + 20px));
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
     user-select: none;
 
     @include backdrop;
 
     display: flex;
     align-items: center;
+
     padding: 0 18px;
     gap: 14px;
-    
-    // Полное скрытие элемента из потока и кликов, пока он не виден
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out, visibility 0.8s ease-in-out;
+
+    transition:
+        transform .6s cubic-bezier(.22, 1, .36, 1),
+        opacity .4s ease,
+        visibility 0s linear .6s;
 
     @include mobile {
         max-width: 400px;
     }
+
     @include mobile-s {
         max-width: 300px;
     }
 
-    &::before { @include glow-border; }
+    &::before {
+        @include glow-border;
+    }
 
     &::after {
         content: '';
+
         position: absolute;
+
         top: -60px;
         left: 50%;
+
         transform: translateX(-50%);
+
         width: 200px;
         height: 80px;
+
         background: radial-gradient(
             ellipse,
             $purpleShadow 0%,
             transparent 70%
         );
+
         pointer-events: none;
     }
 
+    // =========================
+    // VISIBLE
+    // =========================
+
     &--visible {
         opacity: 1;
+
         visibility: visible;
+
         pointer-events: auto;
-        transform: translateX(-50%) translateY(0);
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+
+        transition:
+            transform .6s cubic-bezier(.22, 1, .36, 1),
+            opacity .4s ease,
+            visibility 0s linear 0s;
     }
+
+    // =========================
+    // ICON
+    // =========================
 
     &__icon {
         width: 38px;
         height: 38px;
+
         flex-shrink: 0;
+
         border-radius: 10px;
+
         background: $purpleShadow;
+
         border: 1px solid var(--color-purple);
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         color: var(--color-purple);
     }
 
+    // =========================
+    // CONTENT
+    // =========================
+
     &__content {
         flex: 1;
+
         min-width: 0;
+
         display: flex;
         flex-direction: column;
+
         gap: 3px;
     }
 
     &__title {
         font-size: 13px;
         font-weight: 500;
+
         color: #e8e0ff;
+
         margin: 0;
+
         white-space: nowrap;
+
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     &__subtitle {
         font-size: 14px;
+
         color: var(--color-hover-purple);
+
         margin: 0;
+
         white-space: nowrap;
+
         overflow: hidden;
         text-overflow: ellipsis;
 
         &-wrapper {
             display: flex;
             flex-direction: row;
+
             align-items: center;
+
             gap: 10px;
         }
     }
 
+    // =========================
+    // DOT
+    // =========================
+
     &__dot {
         width: 6px;
         height: 6px;
+
         flex-shrink: 0;
+
         border-radius: 50%;
+
         background: var(--color-purple);
+
         animation: pulse-dot 2s ease-in-out infinite;
     }
+
+    // =========================
+    // CLOSE
+    // =========================
 
     &__close-button {
         width: 42px;
         height: 42px;
+
         padding: 0;
+
+        flex-shrink: 0;
+
         border-radius: 100%;
+
         background: rgba(255, 255, 255, .06);
-        opacity: 50%;
+
+        opacity: .5;
+
         border: none;
+
         color: rgba(200, 180, 255, .4);
+
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: color .15s, background .15s;
-        
+
+        transition:
+            color .15s ease,
+            background .15s ease,
+            opacity .15s ease;
 
         @include hover {
             color: var(--color-hover-purple);
-        }
 
-        &-icon {
-            width: 22px;
-            height: 22px;
+            opacity: 1;
+
+            background: rgba(255, 255, 255, .1);
         }
+    }
+
+    &__close-button-icon {
+        width: 22px;
+        height: 22px;
     }
 }

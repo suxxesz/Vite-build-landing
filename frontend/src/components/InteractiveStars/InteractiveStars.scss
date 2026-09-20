@@ -1,4 +1,3 @@
-// InteractiveStars.scss (обновляем частицы под новую палитру)
 .interactive-stars {
   position: fixed;
   inset: 0;
@@ -12,21 +11,75 @@
   z-index: 50;
   pointer-events: none;
 
-  .star-particle {
+  .burst-core {
     position: absolute;
     top: 0; left: 0;
+    width: 46px;
+    height: 46px;
+    margin: -23px 0 0 -23px;
     border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, var(--pc, #f5f4f4) 55%, transparent 100%);
-    box-shadow: 0 0 14px 4px color-mix(in srgb, var(--pc, #e6e4e1) 70%, transparent);
+    background: radial-gradient(circle, #ffffff 0%, var(--pc, #fff) 38%, transparent 72%);
+    filter: blur(1px);
+    mix-blend-mode: screen;
   }
 
-  .star-flash {
+
+  .burst-ring {
     position: absolute;
     top: 0; left: 0;
-    width: 40px; height: 40px;
-    margin: -20px 0 0 -20px;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
     border-radius: 50%;
-    border: 1.5px solid rgba(155, 152, 146, 0.8);
-    box-shadow: 0 0 24px 6px rgba(238, 235, 231, 0.4);
+    border: 1.5px solid color-mix(in srgb, var(--pc, #fff) 75%, white 25%);
+    box-shadow:
+      0 0 12px 1px color-mix(in srgb, var(--pc, #fff) 60%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--pc, #fff) 45%, transparent);
+    mix-blend-mode: screen;
+  }
+
+  .burst-rays {
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 2px;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 130px;
+      height: 2px;
+      margin: -1px 0 0 -65px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in srgb, var(--pc, #fff) 70%, white 30%) 50%,
+        transparent
+      );
+      mix-blend-mode: screen;
+    }
+    &::after {
+      transform: rotate(90deg);
+    }
+  }
+
+  .burst-spark {
+    position: absolute;
+    top: 0; left: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--pc, #fff) 85%, white 15%), transparent);
+    box-shadow: 0 0 6px 0.5px color-mix(in srgb, var(--pc, #fff) 60%, transparent);
+    mix-blend-mode: screen;
+  }
+
+  .burst-dust {
+    position: absolute;
+    top: 0; left: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, var(--pc, #fff) 60%, transparent 100%);
+    mix-blend-mode: screen;
   }
 }

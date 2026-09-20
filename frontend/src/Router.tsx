@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-const BASE = '/core/'
+const BASE = '/Vite-build-landing/'
 
 export const useRoute = () => {
   const getPath = () => {
     const full = window.location.pathname
-    // убираем basename из пути: '/core/form' → '/form'
     return full.startsWith(BASE.slice(0, -1))
       ? full.slice(BASE.length - 1) || '/'
       : full

@@ -74,6 +74,7 @@ export default function CopyProvider({ children } : { children: React.ReactNode 
         href: (user?.id && `https://discord.com/users/${user.id}`) as string,
 
         time: formatLastSeen(user?.lastSeen),
+        activities : user?.activities  , 
 
         status,
 

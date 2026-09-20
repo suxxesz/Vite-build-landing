@@ -5,11 +5,15 @@ html {
   &.is-lock {
     overflow: hidden;
   }
+   width: 100%;
+    overflow-x: clip;
 }
 
 body {
   @include fluid-text(18, 14);
-
+  width: 100%;
+    margin: 0;
+    overflow-x: clip;
   display: flex;
   flex-direction: column;
   align-self: center;
@@ -19,13 +23,13 @@ body {
   object-fit: cover;
   background-size: cover;
   background-image: url('../assets/videos/light-theme.gif');
-  transition: 0.1s background-image 0.1s ease-in-out;
-  overflow-x: hidden;
+  transition: 0.1s background-image 0.1s ease-in-out;ь
   html.is-dark-theme & {
     background-image: url('../assets/videos/dark-theme.gif');
   }
   background-position: center ; 
   background-repeat: no-repeat
+  
 }
 
 

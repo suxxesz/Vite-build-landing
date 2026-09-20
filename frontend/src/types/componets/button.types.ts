@@ -9,6 +9,7 @@ export interface ButtonProps<T>  {
     rel?: string
     onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>
     type?: 'button' | 'submit' | 'reset' , 
-    title : string
+    title : string 
+    ref?: React.Ref<HTMLAnchorElement>
     onPointerLeave?: React.PointerEventHandler<HTMLButtonElement | HTMLAnchorElement>
 }

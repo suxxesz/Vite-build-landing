@@ -9,3 +9,23 @@ export interface IFormData  {
 }
 
 export type TAsyncData<T> =  (formData : IFormData ) => Promise<T>
+
+export interface TActivities {
+    name : string
+    type : number
+    url: string
+    details: any,
+    state : any
+    applicationId: string,
+      timestamps: {
+        start: Date,
+        end: any | null
+      },
+      party: any,
+      syncId: any,
+      assets: any,
+      flags: number,
+      emoji: string | null,
+      buttons: [],
+      createdTimestamp: Date
+}

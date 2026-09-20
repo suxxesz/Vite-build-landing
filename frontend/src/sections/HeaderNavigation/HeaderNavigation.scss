@@ -6,12 +6,16 @@
     flex-direction: row-reverse;
     align-items: center;
     gap: 5px;
+
     padding-inline: 3px;
+    margin-left: 0;
+
     box-sizing: border-box;
-    width: 100%;
+    min-width: 0;
     max-width: 100%;
+
     z-index: 1;
-    margin: 12px 0; // Безопасный отступ без горизонтального вылета
+
     animation: navSlideUp .2s ease forwards;
 
     &.unreversed {
@@ -72,6 +76,12 @@
         pointer-events: none;
         perspective: 500px;
         will-change: clip-path, filter, opacity;
+        touch-action: manipulation;
+        overflow-x: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
         .unreversed & {
             right: auto;
@@ -81,7 +91,7 @@
         @include mobile-s {
             right: 50%;
             transform: translateX(50%);
-            max-width: calc(100dvw - 24px); // Заменено 100vw на 100dvw
+            max-width: calc(100dvw - 24px);
 
             .unreversed & {
                 left: 50%;

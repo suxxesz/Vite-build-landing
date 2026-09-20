@@ -4,10 +4,12 @@ import cors from '@fastify/cors'
 import { Telegraf } from 'telegraf'
 import { Type } from '@sinclair/typebox'
 
-import { client } from './src/discord/bot'
 import addBootstrap from './src/plugins/bootstrap'
 import databasePlugin from './src/plugins/database'
+import discordPlugin from './src/discord/model/discordPlugin'
 import register from './bot/core/register'
+import { onDiscordAssetsRegister } from './src/discord/model/assets'
+import { client } from './src/discord/bot'
 
 const serverOptions = {
   logger: {
@@ -23,19 +25,13 @@ const app: FastifyInstance = Fastify(serverOptions)
 
 const schema = Type.Object({
   TOKEN: Type.String(),
-
   PORT: Type.Number({
     default: 3001,
   }),
-
   GUILD_ID: Type.String(),
-
   TELEGRAM_BOT_TOKEN: Type.String(),
-
   TELEGRAM_CHAT_ID: Type.String(),
-
   TURSO_URL: Type.String(),
-
   TURSO_AUTH_TOKEN: Type.String(),
 })
 
@@ -62,20 +58,24 @@ async function start() {
     await app.register(addBootstrap)
 
     // Telegram
-    const bot = new Telegraf(
-      app.config.TELEGRAM_BOT_TOKEN,
-    )
-
+    const bot = new Telegraf(app.config.TELEGRAM_BOT_TOKEN)
     app.decorate('bot', bot)
-
     await register(app)
 
     // Discord
-    await client.login(app.config.TOKEN)
+    await discordPlugin(app)
+
+    // Логинимся только если клиент ещё не залогинен —
+    // иначе поймаешь "Client is already logged in / destroyed"
+    if (!client.isReady()) {
+      await app.client.login(app.config.TOKEN)
+    }
 
     bot.start(async (ctx) => {
       await ctx.reply('🤖 Бот запущен')
     })
+
+    await onDiscordAssetsRegister(app)
 
     await app.ready()
 
@@ -88,9 +88,7 @@ async function start() {
     // Telegram
     await bot.launch()
 
-    app.log.info(
-      `Server started on port ${app.config.PORT}`,
-    )
+    app.log.info(`Server started on port ${app.config.PORT}`)
   } catch (error) {
     app.log.error(error, 'Startup error!')
     process.exit(1)

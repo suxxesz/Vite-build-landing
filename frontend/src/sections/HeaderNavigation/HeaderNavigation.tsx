@@ -1,6 +1,6 @@
 import './HeaderNavigation.scss'
 import {
-    useState, useCallback, useRef, useEffect, useMemo,
+    useState, useCallback, useRef, useEffect, useMemo, useEffectEvent , 
     forwardRef, useImperativeHandle, memo
 } from 'react'
 import Button from '@/components/Button'
@@ -9,9 +9,10 @@ import clsx from 'clsx'
 import gsap from 'gsap'
 
 const linksData = [
-    { href: '/core/biography', title: 'About me' },
-    { href: '/core/form', title: 'Contact me' },
-    { href: '/core/policy', title: 'Privacy  and rights' },
+    { href: '/', title: 'Main page' },
+    { href: '/biography', title: 'About me' },
+    { href: '/form', title: 'Contact me' },
+    { href: '/policy', title: 'Privacy  and rights' },
 ]
 
 const GLYPHS = '!<>-_\\/[]{}=+*^?#$%&ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -86,6 +87,7 @@ const DecodeTitle = memo(forwardRef<DecodeHandle, { text: string; reduced: boole
             </span>
         )
     }
+    
 ))
 DecodeTitle.displayName = 'DecodeTitle'
 
@@ -127,6 +129,18 @@ const NavItem = memo(forwardRef<NavItemHandle, { item: { href: string; title: st
                 barTween.current?.(0)
             }
         }), [])
+        const onLocateMove = useCallback(
+            (e: React.MouseEvent<HTMLAnchorElement>) => {
+                e.preventDefault()
+
+                const href = e.currentTarget.href
+
+                setTimeout(() => {
+                    window.location.href = href
+                }, 1000)
+            },
+            []
+        )
 
         return (
             <div
@@ -143,6 +157,7 @@ const NavItem = memo(forwardRef<NavItemHandle, { item: { href: string; title: st
                     target="_blank"
                     unussual={true}
                     title={item.title}
+                    onClick={onLocateMove}
                 >
                     <DecodeTitle ref={decodeRef} text={item.title} reduced={reduced} />
                 </Button>
@@ -168,7 +183,7 @@ const HeaderNavigation = memo(function HeaderNavigation(props: { onLeftSide: boo
         setIsOpened(prev => !prev)
     }, [])
 
-    // Мемоизация динамических классов для предотвращения лишних сборок строк при перерисовках
+
     const rootClassName = useMemo(
         () => clsx('navigation', onLeftSide && 'unreversed'),
         [onLeftSide]
@@ -198,7 +213,7 @@ const HeaderNavigation = memo(function HeaderNavigation(props: { onLeftSide: boo
     }, [opened])
 
     useEffect(() => {
-        ctx.current = gsap.context(() => {}, rootRef)
+        ctx.current = gsap.context(() => { }, rootRef)
         return () => ctx.current?.revert()
     }, [])
 

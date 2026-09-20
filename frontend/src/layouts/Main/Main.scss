@@ -40,14 +40,14 @@
         }
 
         @include mobile {
-            font-size: clamp(80px, 5vw, 100px);
+            font-size: clamp(100px, 5vw, 100px);
             letter-spacing: 1.2rem;
             margin-top: 20px;
             margin-bottom: 20px;
         }
 
         @media (width < 500px) {
-            font-size: clamp(40px, 5vw, 80px);
+            font-size: clamp(100px, 5vw, 120px);
             letter-spacing: .8rem;
             margin-top: 20px;
             margin-bottom: 20px;
@@ -61,17 +61,31 @@
         }
 
         @include mobile-s {
-           font-size: clamp(70px, 5vw, 80px);
-            letter-spacing: .4rem;
+           font-size: clamp(100px, 5vw, 120px);
+            letter-spacing: 10px;
             margin-top: 30px;
             margin-bottom: 20px;
         }
 
         @media (width < 330px) {
             font-size: clamp(20px, 5vw, 40px);
-            font-family: Manrope;
             perspective: none;
             letter-spacing: 5px;
+        }
+        &-visual {
+            display: inline-block;
+            transform-style: preserve-3d; // пробрасывает perspective родителя на буквы-потомки
+        }
+
+        &-word {
+            display: inline-block;
+            white-space: nowrap; // слово не рвётся посередине при переносе строк
+            transform-style: preserve-3d;
+        }
+
+        &-char {
+            display: inline-block;
+            will-change: transform, filter, opacity;
         }
     }
 

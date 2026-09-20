@@ -7,3 +7,5 @@ export const songAtom = atom<HTMLAudioElement | null>(null)
 export const iconSizeAtom = atom<number>(16)
 
 export const sessionIdAtom = atomWithStorage<string | null>("session_id", null)
+
+export const isOptimized = atomWithStorage<boolean | null>("lowmode", null)

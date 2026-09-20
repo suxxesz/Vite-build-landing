@@ -24,19 +24,20 @@ const audioData : TAudio = [
   {
       src: song2,
         image : song2Image,
-        title: 'platina - santa klaus',
+        title: '1Lthree - sleep',
         end: '2:40'
+        
     } ,
     {
         src: song1 , 
         image : song1Image,
-        title: 'sleep',
+        title: '1Lthree - take your mind out',
         end: '1:40'
     },
     {
       src: song3,
         image : song3Image,
-        title: 'LONOWN, riserayss - worry ',
+        title: '1LThree -  suffocation',
         end: '2:40'
     } ,
     {
@@ -64,7 +65,7 @@ const MainPage = () => {
         <Main  children='SUXXESZ' subtitle="Web developer | UI/UX Designer" />
         {createPortal(
           <Overlay>
-            <Button href="/core/form" className='link' unussual>Write message here...</Button>
+            <Button href="/form" className='link' unussual>Write message here...</Button>
           </Overlay>,
           document.body
         )}

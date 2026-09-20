@@ -140,7 +140,7 @@ export default function NotificationBell() {
                 aria-haspopup="dialog"
                 onClick={handleToggle}
             >
-                <Bell size={20} className='icon-switcher'/>
+                <Bell size={20} className='notif__trigger--icon icon-switcher'/>
                 {isUnread && (
                     <span className="notif__badge" aria-hidden="true" />
                 )}
@@ -215,7 +215,7 @@ export default function NotificationBell() {
                                 {!loading && !session && (
                                     <p className="notif__empty">
                                         No notifications yet. Try contact with me - <br/>
-                                        <Button href='/core/form' unussual={true}>Here!</Button>
+                                        <Button href='/form' unussual={true}>Here!</Button>
                                     </p>
                                 )}
 

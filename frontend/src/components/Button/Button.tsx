@@ -15,6 +15,7 @@ export default (props: ButtonComponentProps) => {
     isDisabeled,
     title,
     target, 
+    ref , 
     ...rest 
   } = props
 
@@ -49,6 +50,7 @@ export default (props: ButtonComponentProps) => {
       target={safeTarget}
       title={title}
       onClick={linkOnClick}
+      ref={ref}
       {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
     >
       {children}

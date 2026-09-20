@@ -9,6 +9,8 @@ const EXPLODE_DELAY = 0.55
 const TRAIL_LENGTH = 16
 const PALETTE = ['#ffffff', '#c9b8ff', '#8a60f5', '#5ecbff', '#c65fe0', '#ffd27a']
 
+const CURSOR_AIM_OFFSET = { x: -14, y: 18 }
+
 export default function InteractiveStars() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const layerRef = useRef<HTMLDivElement>(null)
@@ -43,10 +45,9 @@ export default function InteractiveStars() {
     const pickColor = () => PALETTE[Math.floor(Math.random() * PALETTE.length)]
 
     const spawnComet = (): Comet => {
-      // рождаются сверху, летят по диагонали вниз — классический звездопад
       const x = Math.random() * W * 1.3 - W * 0.15
       const y = -30 - Math.random() * 120
-      const angle = (55 + Math.random() * 30) * (Math.PI / 180) // вниз-вправо/влево по диагонали
+      const angle = (55 + Math.random() * 30) * (Math.PI / 180) 
       const dir = Math.random() < 0.5 ? 1 : -1
       const speed = 6 + Math.random() * 9
       return {
@@ -66,37 +67,120 @@ export default function InteractiveStars() {
     let explodeTimer: number | null = null
     resize()
 
-    const explode = (comet: Comet) => {
-      const count = 14 + Math.floor(Math.random() * 12)
+    const spawnCoreFlash = (comet: Comet) => {
+      const flash = document.createElement('div')
+      flash.className = 'burst-core'
+      flash.style.setProperty('--pc', comet.color)
+      layer.appendChild(flash)
+
+      gsap.set(flash, { x: comet.x, y: comet.y, opacity: 0, scale: 0.2 })
+      const tl = gsap.timeline()
+      tl.to(flash, { opacity: 1, scale: 1, duration: 0.12, ease: 'power2.out' })
+      tl.to(flash, {
+        opacity: 0, scale: 2.3, duration: 0.5, ease: 'power3.out',
+        onComplete: () => flash.remove(),
+      }, '-=0.02')
+    }
+
+    const spawnShockwave = (comet: Comet) => {
+      const ring = document.createElement('div')
+      ring.className = 'burst-ring'
+      ring.style.setProperty('--pc', comet.color)
+      layer.appendChild(ring)
+
+      gsap.set(ring, { x: comet.x, y: comet.y, opacity: 0.9, scale: 0.1 })
+      gsap.to(ring, {
+        scale: 5.4, opacity: 0, duration: 0.65, ease: 'power2.out',
+        onComplete: () => ring.remove(),
+      })
+    }
+
+    const spawnRays = (comet: Comet) => {
+      const rays = document.createElement('div')
+      rays.className = 'burst-rays'
+      rays.style.setProperty('--pc', comet.color)
+      layer.appendChild(rays)
+
+      gsap.set(rays, {
+        x: comet.x, y: comet.y, opacity: 0, scale: 0.3,
+        rotate: gsap.utils.random(-15, 15),
+      })
+      const tl = gsap.timeline()
+      tl.to(rays, { opacity: 1, scale: 1, duration: 0.12, ease: 'power1.out' })
+      tl.to(rays, {
+        opacity: 0, scale: 1.7, duration: 0.45, ease: 'power2.in',
+        onComplete: () => rays.remove(),
+      }, 0.05)
+    }
+
+    const spawnSparks = (comet: Comet) => {
+      const count = 10 + Math.floor(Math.random() * 8)
       for (let i = 0; i < count; i++) {
-        const particle = document.createElement('div')
-        particle.className = 'star-particle'
-        particle.style.setProperty('--pc', pickColor())
-        layer.appendChild(particle)
+        const spark = document.createElement('div')
+        spark.className = 'burst-spark'
+        spark.style.setProperty('--pc', pickColor())
+
+        const angle = (Math.PI * 2 * i) / count + gsap.utils.random(-0.25, 0.25)
+        const dist = 55 + Math.random() * 95
+        const length = 14 + Math.random() * 16
+        spark.style.width = `${length}px`
+        layer.appendChild(spark)
+
+        gsap.set(spark, {
+          x: comet.x, y: comet.y,
+          rotate: (angle * 180) / Math.PI,
+          opacity: 1,
+          scaleX: 0.3,
+          transformOrigin: 'left center',
+        })
+
+        gsap.to(spark, { scaleX: 1, duration: 0.16, ease: 'power2.out' })
+        gsap.to(spark, {
+          x: comet.x + Math.cos(angle) * dist,
+          y: comet.y + Math.sin(angle) * dist,
+          scaleX: 0.15,
+          opacity: 0,
+          duration: 0.45 + Math.random() * 0.35,
+          ease: 'power3.out',
+          delay: 0.05,
+          onComplete: () => spark.remove(),
+        })
+      }
+    }
+
+    const spawnDust = (comet: Comet) => {
+      const count = 5 + Math.floor(Math.random() * 4)
+      for (let i = 0; i < count; i++) {
+        const dust = document.createElement('div')
+        dust.className = 'burst-dust'
+        dust.style.setProperty('--pc', pickColor())
+
         const angle = Math.random() * Math.PI * 2
-        const dist = 40 + Math.random() * 130
-        const size = 3 + Math.random() * 4
-        particle.style.width = `${size}px`
-        particle.style.height = `${size}px`
-        gsap.set(particle, { x: comet.x, y: comet.y, opacity: 1, scale: 0.4 })
-        gsap.to(particle, { scale: 1.4, duration: 0.15, ease: 'power2.out' })
-        gsap.to(particle, {
+        const dist = 20 + Math.random() * 50
+        const size = 2 + Math.random() * 2.5
+        dust.style.width = `${size}px`
+        dust.style.height = `${size}px`
+        layer.appendChild(dust)
+
+        gsap.set(dust, { x: comet.x, y: comet.y, opacity: 0.9, scale: 0.5 })
+        gsap.to(dust, {
           x: comet.x + Math.cos(angle) * dist,
           y: comet.y + Math.sin(angle) * dist,
           opacity: 0,
-          scale: 0.1,
-          duration: 0.7 + Math.random() * 0.6,
-          ease: 'power2.out',
-          delay: 0.05,
-          onComplete: () => particle.remove(),
+          scale: 1.4,
+          duration: 0.7 + Math.random() * 0.5,
+          ease: 'sine.out',
+          onComplete: () => dust.remove(),
         })
       }
-      // короткая вспышка-кольцо в месте взрыва
-      const flash = document.createElement('div')
-      flash.className = 'star-flash'
-      layer.appendChild(flash)
-      gsap.set(flash, { x: comet.x, y: comet.y, opacity: 1, scale: 0.2 })
-      gsap.to(flash, { scale: 3.2, opacity: 0, duration: 0.6, ease: 'power2.out', onComplete: () => flash.remove() })
+    }
+
+    const explode = (comet: Comet) => {
+      spawnCoreFlash(comet)
+      spawnShockwave(comet)
+      spawnRays(comet)
+      spawnSparks(comet)
+      spawnDust(comet)
     }
 
     let rafId: number
@@ -105,7 +189,6 @@ export default function InteractiveStars() {
       t += 0.016
       ctx.clearRect(0, 0, W, H)
 
-      // фоновая мерцающая пыль
       for (const s of bgStars) {
         const a = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase))
         ctx.beginPath()
@@ -143,7 +226,6 @@ export default function InteractiveStars() {
           c.y += c.vy
         }
 
-        // хвост
         c.trail.push({ x: c.x, y: c.y })
         if (c.trail.length > TRAIL_LENGTH) c.trail.shift()
 
@@ -159,12 +241,11 @@ export default function InteractiveStars() {
 
       while (comets.length < 11) comets.push(spawnComet())
 
-      // отрисовка хвостов и голов
       comets.forEach((c) => {
         const n = c.trail.length
         for (let j = 0; j < n; j++) {
           const p = c.trail[j]
-          const k = j / n // 0 (старый/тусклый) -> 1 (свежий/яркий)
+          const k = j / n 
           const r = c.radius * (0.15 + k * 0.85)
           ctx.beginPath()
           ctx.fillStyle = c.caught
@@ -174,7 +255,6 @@ export default function InteractiveStars() {
           ctx.fill()
         }
 
-        // голова кометы с мощным свечением
         ctx.save()
         ctx.shadowColor = c.caught ? '#ffaa00' : c.color
         ctx.shadowBlur = c.caught ? 26 : 16
@@ -190,8 +270,8 @@ export default function InteractiveStars() {
     loop()
 
     const onMouseMove = (e: PointerEvent) => {
-      mouse.x = e.clientX
-      mouse.y = e.clientY
+      mouse.x = e.clientX + CURSOR_AIM_OFFSET.x
+      mouse.y = e.clientY + CURSOR_AIM_OFFSET.y
     }
     window.addEventListener('pointermove', onMouseMove)
     window.addEventListener('resize', resize)

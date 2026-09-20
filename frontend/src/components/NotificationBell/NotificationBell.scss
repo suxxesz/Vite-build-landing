@@ -18,6 +18,9 @@
         html.is-dark-theme & { color: var(--color-white); }
 
         @include hover { color: var(--color-purple); }
+        &--icon {
+            stroke: var(--color-white);
+        }
     }
 
     &__badge {
@@ -97,7 +100,7 @@
         font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--color-black);
+        color: var(--color-white);
 
         html.is-dark-theme & { color: var(--color-accent); }
     }
@@ -265,7 +268,7 @@
     &__text {
         font-size: 13px;
         line-height: 1.55;
-        color: var(--color-black);
+        color: var(--color-white);
         word-break: break-word;
         overflow-wrap: anywhere;
         white-space: pre-wrap;

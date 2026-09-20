@@ -42,21 +42,15 @@ body {
   display: flex;
   align-items: center;
   background-color: transparent;
+  margin-right: 0px;
   justify-content: center;
   outline: none;
   transition: 0.1s background-color 0.1s ease-in-out, color 0.1s ease-in-out, opacity 0.3s ease;
   border: none;
   position: relative;
+  stroke: var(--color-white);
 
   &--disabled {
     opacity: 0.5;
-  }
-
-  .icon-switcher {
-    width: 44px !important;
-    height: 44px !important;
-    pointer-events: none; 
-    filter: var(--drop-shadow);
-    color: var(--color-light);
   }
 }

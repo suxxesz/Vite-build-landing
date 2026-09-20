@@ -1,3 +1,4 @@
+import { TActivities } from "./fetch.types"
 export  interface IAudioContext  {
     song : HTMLAudioElement | null,
      isPaused : boolean,
@@ -31,6 +32,7 @@ export interface ICopyContext {
             time: string,
     
             status : string ,
+            activities :  | TActivities[]
 }
 export type CopyContextType = ICopyContext & IUseCopy
 export interface IUseCopy {

@@ -37,24 +37,21 @@ const selectStyles: StylesConfig<TOption, false> = {
     ...base,
     display: 'flex',
     alignItems: 'start',
-    // Выставляем 56px по бокам на десктопе и 0px на мобилках (до 768px)
-    padding: '0 56px',
+    padding: '0 5px',
     '@media (max-width: 768px)': {
       padding: '0 0px',
     },
   }),
 
-  // Сам текст значения (убираем стандартные margin и абсолютные сдвиги)
   singleValue: (base) => ({
     ...base,
-    color: '#fff',
+    color: '#ffffff',
     margin: 0,
     position: 'relative',
     transform: 'none',
     maxWidth: '100%',
   }),
 
-  // Инпут ввода при поиске/фокусе
   input: (base) => ({
     ...base,
     color: '#fff',
